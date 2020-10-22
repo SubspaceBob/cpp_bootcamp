@@ -61,11 +61,26 @@ main(){
     car->perform_service(new_service);
 
 
+    new_car = new CustomerCar("OEN293");
+    shop->register_car(new_car);
+
     // Print content
     shop->print_cars();
 
-    shop->remove_car("HTF935");
 
+    // remove someting from JOL648
+    std::cout << &car->service_history->service->change_parts->part << std::endl; 
+    delete car->service_history->service->change_parts->part;
+
+    //shop->remove_car("HTF935");
+
+    std::cout << "\n\n\n";
     shop->print_cars();
+
+
+
+    Bumper *b = new Bumper();    
+    delete b;
+
     return 0;
 }

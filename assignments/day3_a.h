@@ -1,6 +1,7 @@
 #ifndef DAY3_A_H
 #define DAY3_A_H
 #include <iostream>
+#include <memory>
 class Payment{
 public:
     //Payment();// = delete;
@@ -10,19 +11,23 @@ public:
 }; 
 
 class Part{
+public:
+   ~Part(){
+       std::cout << "deleting part" << std::endl;
+   }  
 } ;
-class Windshield:public Part{
-
-};
-class Bumper:public Part{
-
-};
+class Windshield:public Part{};
+class Bumper:public Part{};
 
 class LinkedParts{
 public:
     Part *part;
     LinkedParts *next = nullptr;
     LinkedParts() = default;
+    ~LinkedParts(){
+        std::cout << "Deleting part" << this << std::endl;
+        delete this->part;
+    }   
 };
 
 class Service{
@@ -32,6 +37,7 @@ public:
         LinkedParts *last_part = this->find_last();
         while (last_part!=nullptr){
             delete last_part;
+            std::cout << "Part deleted" << std::endl;
             last_part = this->find_last();
         }
     };  
@@ -52,6 +58,25 @@ public:
         this->payment = new Payment(amount, method);
         std::cout <<  amount << " " << method << std::endl;
     } 
+
+    void remove(Part *part){
+        std::cout << "Searching for "<< &part << std::endl;
+        LinkedParts *current_partlink = this->change_parts;
+
+        // if first part
+        if (current_partlink->part == part){
+            LinkedParts *lpart_to_be_removed = current_partlink;
+            this->change_parts = current_partlink->next;
+            delete lpart_to_be_removed; 
+        } else { 
+            while(current_partlink->next != nullptr){
+                if (current_partlink->next->part == part){
+                    LinkedParts *lpart_to_be_removed = current_partlink;
+                } 
+            }
+        } 
+           
+    } 
 private:
     LinkedParts *find_last(){
         LinkedParts *current_item = this->change_parts;
@@ -68,6 +93,26 @@ public:
     Service *service;
     ServiceHistory *next = nullptr;
     ServiceHistory() = default;
+    ~ServiceHistory(){
+        std::cout << "Deleting service" << std::endl;
+        //ServiceHistory *last_service = this->find_last();
+        //while (last_service!=nullptr){
+        //    std::cout << "Deleting service" << std::endl;
+         //   delete last_service;
+        //    last_service = this->find_last();
+        //}
+        delete service;
+        std::cout << "Service deleted!" << std::endl;
+    };
+private:
+    ServiceHistory *find_last(){
+        ServiceHistory *current_item = this->next;
+        
+        while (current_item->next != nullptr){
+            current_item = current_item->next;
+        }  
+        return current_item;
+    } 
 };
 
 class CustomerCar{
@@ -75,11 +120,13 @@ public:
     CustomerCar(std::string registration_number);
     CustomerCar() = default;
     ~CustomerCar(){
+        std::cout << "Deleting car" << std::endl;
         ServiceHistory *last_service = this->find_last();
         while (last_service!=nullptr){
             delete last_service;
             last_service = this->find_last();
-        } 
+        }
+        std::cout << "Car deleted!" << std::endl;
     };   
     ServiceHistory *service_history = nullptr;
     std::string registration_number;
@@ -116,6 +163,10 @@ public:
     CustomerCar *car;
     LinkedElement *next = nullptr;
     LinkedElement() = default;
+    ~LinkedElement(){
+        std::cout << "Deleting LinkedElement" << std::endl;
+        delete this->car;
+    }  
 };
 
 class Database{
@@ -151,18 +202,23 @@ public:
     void remove(std::string registration_number){
         std::cout << "Searching for "<< registration_number << std::endl;
         LinkedElement *current_carlink = this->elements;
+
+        // if first car
         if (this->elements->car->registration_number == registration_number)
         {
-            // delete
+            LinkedElement *car_to_be_removed = current_carlink;
+            this->elements = current_carlink->next; // point element to next in line (link or nullptr)
+            delete car_to_be_removed;
         } else{ 
+            // if not first car, check next
             while (current_carlink->next != nullptr){
                 if (current_carlink->next->car->registration_number == registration_number)
                 {
                     std::cout << "Found it, sure you want it removed?!" << std::endl;
-                    LinkedElement *car_to_be_removed = current_carlink->next;
-                    // delete
                     // point to next-next(either a LinkedElement or nullptr)
                     current_carlink->next = current_carlink->next->next;
+                    LinkedElement *car_to_be_removed = current_carlink->next;
+                    delete car_to_be_removed;
                 } else
                 {
                 // Just act as if it was removed normally, it's weekend soon anyway...
