@@ -1,7 +1,7 @@
 CXX = g++
 NAME = Shapy
 all: main.o libshape.so
-	$(CXX) main.o libshape.so -o $(NAME)
+	$(CXX) main.o -L. -lshape -o $(NAME)
 
 main.o: main.cpp
 	$(CXX) -c main.cpp 
