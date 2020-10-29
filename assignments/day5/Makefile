@@ -8,3 +8,6 @@ main.o: main.cpp
 
 libshape.so: shape.cpp
 	$(CXX) --shared -fPIC shape.cpp -o libshape.so
+
+unittests.o: libshape.so
+	$(CXX) tests.cpp -L. -lshape -o unittest_$(NAME)
